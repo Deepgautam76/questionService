@@ -6,6 +6,7 @@ import com.deep.question_service.model.QuestionWrapper;
 import com.deep.question_service.model.Response;
 import com.deep.question_service.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,15 @@ import java.util.List;
 public class QuestionController {
     @Autowired
     private QuestionService questionService;
+
+    @Autowired
+    Environment environment;
     @GetMapping("/questions")
     public ResponseEntity<List<Question>> allQuestion(){
         return questionService.getAllQuestion();
     }
     @PostMapping("/add")
-    public ResponseEntity<Question> addQuestion(@RequestBody Question question){
+    public ResponseEntity<List<Question>> addQuestion(@RequestBody List<Question> question){
         return questionService.addQuestion(question);
     }
     @PutMapping("/update/{id}")
@@ -38,6 +42,11 @@ public class QuestionController {
         return questionService.getQuestionByCategory(category);
     }
 
+
+    /**
+     * These all methods used by the quiz service
+     */
+
     //Here is the generating question by giving noOfQuestion and category
     @GetMapping("/generate")
     public ResponseEntity<List<Long>> getQuestionForQuiz(
@@ -46,17 +55,17 @@ public class QuestionController {
     ){
         return questionService.getQuestionForQuiz(categoryName,numQuestions);
     }
-
-    //Here is get the question by Ids
+    //Here is get the question by List of questionIds
     @PostMapping("/getQuestions")
     public  ResponseEntity<List<QuestionWrapper>>  getQuestionFromId(@RequestBody List<Long> questionIds){
+        System.out.println(environment.getProperty("local.server.port"));
         return questionService.getQuestionFromId(questionIds);
     }
-
-    //Here is getting the score by giving the responses
+    //Here is getting the score by submitting the response
     @PostMapping("/getScore")
     public ResponseEntity<Long> getScore(@RequestBody List<Response> responses){
         return questionService.getScore(responses);
     }
+
 
 }
